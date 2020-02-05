@@ -25,6 +25,7 @@ namespace HCRDialogs
       {
          dialogSet = new DialogSet(conversationState.CreateProperty<DialogState>("state"));
          dialogSet.Add(new GreetingDialog());
+         dialogSet.Add(new LocationDialog());
          this.conversationState = conversationState;
       }
 
@@ -45,13 +46,20 @@ namespace HCRDialogs
                }
                else
                {
+                  var lastdialog = dc.ActiveDialog.Id;
                   var continueResult = await dc.ContinueDialogAsync(cancellationToken);
+                  
                   if (continueResult.Status == DialogTurnStatus.Complete)
-                  {
-                     var greetingResult = (GreetingResult)continueResult.Result;
-                     await turnContext.SendActivityAsync(MessageFactory.Text($"You have reported a crime of {greetingResult.CrimeType}."));
-                     await turnContext.SendActivityAsync(MessageFactory.Text(ThankYou), cancellationToken);
-                  }
+                     switch (lastdialog)
+                     {
+                        case nameof(GreetingDialog):
+
+                           var greetingResult = (GreetingResult)continueResult.Result;
+                           await turnContext.SendActivityAsync(MessageFactory.Text($"You have reported a crime of {greetingResult.CrimeType}."), cancellationToken);
+                           await turnContext.SendActivityAsync(MessageFactory.Text(ThankYou), cancellationToken);
+                           await dc.BeginDialogAsync(nameof(LocationDialog), null, cancellationToken);
+                           break;
+                     }                    
                }
 
                // Save the updated dialog state into the conversation state.

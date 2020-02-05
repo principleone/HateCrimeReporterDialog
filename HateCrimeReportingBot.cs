@@ -7,12 +7,21 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Bot.Builder;
+using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Schema;
+
 
 namespace HCRDialogs
 {
-    public class HateCrimeReportingBot : ActivityHandler
+    public class HCRDialogBot : ActivityHandler
     {
+        private readonly DialogSet dialogSet;
+
+        public HCRDialogBot()
+        {            
+            dialogSet.Add(new GreetingDialog());
+        }
+
         protected override async Task OnMembersAddedAsync(IList<ChannelAccount> membersAdded, ITurnContext<IConversationUpdateActivity> turnContext, CancellationToken cancellationToken)
         {
             foreach (var member in membersAdded)
